@@ -288,6 +288,11 @@ birdnet_verify <- function(
   # Start verifying
   counter <- 0
   verify.list <- list()
+
+  # Sort wav.paths according to og.rec.ids (more robust in case of many subfolders)
+  inds <- unique(unlist(sapply(og.rec.ids, function(pattern) grep(pattern, wav.paths))))
+  wav.paths <- wav.paths[inds]
+
   for (w in 1:length(wav.paths)) {
     this.wav <- list.files(
       path = results.directory,
@@ -322,7 +327,6 @@ birdnet_verify <- function(
 
       t.start <- max(verify[i,start] - buffer, 0)
       t.end <- verify[i,end] + buffer # works even if end.s exceeds rec length
-
       wav <- tuneR::readWave(wav.paths[w], from = t.start, to = t.end,
                              units = 'seconds')
       reclen <- length(wav@left)/wav@samp.rate
