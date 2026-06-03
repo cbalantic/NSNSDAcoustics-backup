@@ -262,10 +262,13 @@ birdnet_heatmap_time <- function(
     # Create a dummy data.table of dates
     if (yes.leap) {
       # 2020 is a leap year, safe to use for range
-      rng <- range(as.Date(julian.breaks, origin = '2020-01-01'))
+      # start with last day of 2019 for correct indexing
+      rng <- range(as.Date(julian.breaks, origin = '2019-12-31'))
+
     } else {
       # 2023 is not a leap year, safe to use for range
-      rng <- range(as.Date(julian.breaks, origin = '2023-01-01'))
+      # start with last day of 2022 for correct indexing
+      rng <- range(as.Date(julian.breaks, origin = '2022-12-31'))
     }
 
     dummy.brks <- data.table(date = seq.Date(from = rng[1],
@@ -303,11 +306,11 @@ birdnet_heatmap_time <- function(
   }
 
   # If comparable.color.breaks == TRUE
-  # Create heatmap color breaks based on the whole dataset, not just this species
+  # Create heatmap color breaks based on the whole dataset, not just this species or locationID
   # so that interspecies comparisons are easier visually (i.e., use the same color breaks)
   if (comparable.color.breaks == TRUE) {
-    prep <- data[,.N, by = c('common_name', 'julian', 'y.unit', 'year')]
-    prep <- prep[,mean(N), by = c('common_name', 'julian', 'y.unit')]
+    prep <- data[,.N, by = c('locationID', 'common_name', 'julian', 'y.unit', 'year')]
+    prep <- prep[,mean(N), by = c('locationID', 'common_name', 'julian', 'y.unit')]
 
     if(nrow(prep) == 0) {
       stop('No detections for this combination of locationID, common.name, and conf.threshold.')

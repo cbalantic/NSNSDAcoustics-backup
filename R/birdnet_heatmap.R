@@ -176,10 +176,12 @@ birdnet_heatmap <- function(
     # Create a dummy data.table of dates
     if (yes.leap) {
       # 2020 is a leap year, safe to use for range
-      rng <- range(as.Date(julian.breaks, origin = '2020-01-01'))
+      # start with last day of 2019 for correct indexing
+      rng <- range(as.Date(julian.breaks, origin = '2019-12-31'))
     } else {
       # 2023 is not a leap year, safe to use for range
-      rng <- range(as.Date(julian.breaks, origin = '2023-01-01'))
+      # start with last day of 2022 for correct indexing
+      rng <- range(as.Date(julian.breaks, origin = '2022-12-31'))
     }
 
     dummy.brks <- data.table(date = seq.Date(from = rng[1],
