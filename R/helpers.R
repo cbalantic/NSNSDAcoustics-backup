@@ -268,7 +268,7 @@ normdBA <- function (x) { (x-(-10)) / (80 - (-10)) }
 
 birdnet_audio_embed <- function(
     results,
-    audio.directory,
+    audio.directory = NULL, # if many sub.dirs, can omit this arg and will pull from result$filepath
     locationID,
     recording.id.col,
     common.name,
@@ -276,11 +276,6 @@ birdnet_audio_embed <- function(
     year,
     frq.lim = c(0, 12)
 ) {
-
-  # Ensure forward slash at end ($) of directories
-  if (grepl("\\/$", audio.directory) == FALSE) {
-    audio.directory <- paste0(audio.directory, '/')
-  }
 
   if (!('recordingID' %in% colnames(results))) {
     results[,recordingID := basename(filepath)]
@@ -296,6 +291,15 @@ birdnet_audio_embed <- function(
                      & confidence >= confidence.threshold
                      & locationID %in% c(locid, paste0('temp-', locid))][
                        sample(.N, size = 1, replace = FALSE)]
+
+  if(is.null(audio.directory)) {
+    audio.directory <- dirname(one.res$filepath)
+  }
+
+  # Ensure forward slash at end ($) of directories
+  if (grepl("\\/$", audio.directory) == FALSE) {
+    audio.directory <- paste0(audio.directory, '/')
+  }
 
   if(nrow(one.res) == 0) {
     stop('No results for this input combination. Check your inputs or try a lower `confidence.threshold`.')
